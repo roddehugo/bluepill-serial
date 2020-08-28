@@ -300,13 +300,13 @@ const char *cdcacm_get_serialno(void)
     return serialno;
 }
 
-void cdcacm_write_now(char *buf, int len)
+void cdcacm_write_now(const char *buf, int len)
 {
     assert(usbdev);
     assert(len <= CDCACM_PACKET_SIZE);
     int i;
-    char *p = buf;
-    char * const end = buf + len;
+    const char *p = buf;
+    const char * const end = buf + len;
     while (p < end)
     {
         i = 0;

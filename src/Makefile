@@ -59,6 +59,7 @@ LDPATHS += -L$(LIB_OPENCM3_DIR)/lib
 LDFLAGS += $(ARCH) $(LDPATHS)
 LDFLAGS += -specs=$(SPECS) -nostartfiles
 LDFLAGS += -Wl,-gc-sections
+LDFLAGS += -Wl,--build-id
 LDFLAGS += -Wl,-Tbluepill.ld
 LDFLAGS += -Wl,-Map=$(PROGRAM).map -Wl,--cref
 

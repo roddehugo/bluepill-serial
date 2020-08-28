@@ -9,6 +9,6 @@
 void cdcacm_init(void);
 int cdcacm_get_configuration(void);
 const char *cdcacm_get_serialno(void);
-void cdcacm_write_now(char *buf, int len);
+void cdcacm_write_now(const char *buf, int len);
 
 #endif
