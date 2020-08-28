@@ -1,0 +1,23 @@
+### C/C++ ###
+*.d
+*.o
+
+*.a
+*.lib
+
+*.bin
+*.hex
+*.lst
+*.sym
+*.map
+*.elf
+
+# Debug files
+*.dSYM/
+
+# Make files
+*.old
+obj/
+
+### OSX ###
+.DS_Store
