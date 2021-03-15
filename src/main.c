@@ -81,11 +81,11 @@ int main(void)
         {
             if (heartbeat(1000))
             {
-                cdcacm_write_now("beat fw=", 8);
-                cdcacm_write_now(fw_version, fw_version_len);
-                cdcacm_write_now(" build=", 7);
-                cdcacm_write_now(build_id, build_id_len);
-                cdcacm_write_now("\n", 1);
+                cdcacm_write("beat fw=", 8);
+                cdcacm_write(fw_version, fw_version_len);
+                cdcacm_write(" build=", 7);
+                cdcacm_write(build_id, build_id_len);
+                cdcacm_write("\n", 1);
             }
         }
     }
