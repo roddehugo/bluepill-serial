@@ -16,7 +16,7 @@
 static char serialno[9] = {0};
 
 static usbd_device *usbdev = NULL;
-static uint16_t usbd_configuration = 0;
+static volatile uint16_t usbd_configuration = 0;
 static uint8_t usbd_control_buffer[256];
 
 static const char *usb_strings[] = {
@@ -165,6 +165,37 @@ static const struct usb_config_descriptor config = {
     .interface = ifaces,
 };
 
+void cdcacm_write_now(const char *buf, int len)
+{
+    assert(usbdev);
+    assert(len <= CDCACM_PACKET_SIZE);
+    int i;
+    const char *p = buf;
+    const char * const end = buf + len;
+    while (p < end)
+    {
+        i = 0;
+        while (p + i < end)
+        {
+            if (p[i] == '\r' || p[i] == '\n')
+                break;
+            i++;
+        }
+        if (i > 0)
+        {
+            while (usbd_ep_write_packet(usbdev, 0x81, p, i) == 0)
+                ;
+            p += i;
+        }
+        if (*p == '\r' || *p == '\n')
+        {
+            while (usbd_ep_write_packet(usbdev, 0x81, "\r\n", 2) == 0)
+                ;
+            p++;
+        }
+    }
+}
+
 static void cdcacm_set_modem_state(usbd_device *dev,
         int iface, bool dsr, bool dcd)
 {
@@ -300,34 +331,12 @@ const char *cdcacm_get_serialno(void)
     return serialno;
 }
 
-void cdcacm_write_now(const char *buf, int len)
+void cdcacm_write(const char *buf, int len)
 {
-    assert(usbdev);
-    assert(len <= CDCACM_PACKET_SIZE);
-    int i;
-    const char *p = buf;
-    const char * const end = buf + len;
-    while (p < end)
-    {
-        i = 0;
-        while (p + i < end)
-        {
-            if (p[i] == '\r' || p[i] == '\n')
-                break;
-            i++;
-        }
-        if (i > 0)
-        {
-            while (usbd_ep_write_packet(usbdev, 0x81, p, i) == 0)
-                ;
-            p += i;
-        }
-        if (*p == '\r' || *p == '\n')
-        {
-            while (usbd_ep_write_packet(usbdev, 0x81, "\r\n", 2) == 0)
-                ;
-            p++;
-        }
+    while(len >= CDCACM_PACKET_SIZE) {
+        cdcacm_write_now(buf, CDCACM_PACKET_SIZE);
+        buf += CDCACM_PACKET_SIZE;
+        len -= CDCACM_PACKET_SIZE;
     }
+    cdcacm_write_now(buf, len);
 }
-
